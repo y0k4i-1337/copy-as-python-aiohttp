@@ -18,12 +18,6 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api(libs.commons.math3)
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation(libs.guava)
-
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
 
@@ -52,6 +46,8 @@ tasks.named<Test>("test") {
 }
 
 tasks.jar {
+    // Include the dependencies in the JAR file
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory()) zipTree(it) else it })
     // Customize the manifest file
     manifest {
         attributes(mapOf("Implementation-Title" to project.name,
