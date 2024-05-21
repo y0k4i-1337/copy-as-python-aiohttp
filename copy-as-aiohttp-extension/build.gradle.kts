@@ -3,8 +3,6 @@ version = "0.1.0"
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id("java-library")
-    // Apply the distribution plugin to create a distribution of the project.
-    id("java-library-distribution")
 }
 
 repositories {
@@ -33,13 +31,6 @@ java {
     }
 }
 
-// Define the main distribution of the project.
-distributions {
-    main {
-        distributionBaseName = "copy-as-python-aiohttp"
-    }
-}
-
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
@@ -53,4 +44,28 @@ tasks.jar {
         attributes(mapOf("Implementation-Title" to project.name,
                          "Implementation-Version" to project.version))
     }
+}
+
+tasks.register<Copy>("distJar") {
+    // Define the output directory for the JAR file
+    val outputDir = file("$buildDir/distributions")
+    // Define the output file name
+    val outputName = "copy-as-python-aiohttp-$version.jar"
+    // Define the destination file
+    val outputFile = outputDir.resolve(outputName)
+    // Define the source file
+    val sourceFile = tasks.jar.get().archiveFile.get().asFile
+    // Copy the JAR file to the output directory
+    from(sourceFile)
+    into(outputDir)
+    // Rename the JAR file
+    rename(sourceFile.name, outputName)
+}
+
+tasks.named("distJar") {
+    dependsOn("jar")
+}
+
+tasks.named("build") {
+    finalizedBy("distJar")
 }
