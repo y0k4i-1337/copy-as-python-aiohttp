@@ -72,7 +72,7 @@ public class ReqParser {
     public String asPasswordSprayingTemplate() {
         StringBuilder sb = new StringBuilder();
         sb.append(buildPreamble());
-        sb.append(buildImports("aiohttp", "aiofiles", "aiocsv", "argparse", "asyncio", "logging"));
+        sb.append(buildImports("argparse", "asyncio", "logging", "aiohttp", "aiofiles", "aiocsv"));
         sb.append("\n\n");
         sb.append(buildGlobals());
         sb.append("\n\n");
