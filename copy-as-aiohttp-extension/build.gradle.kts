@@ -48,11 +48,9 @@ tasks.jar {
 
 tasks.register<Copy>("distJar") {
     // Define the output directory for the JAR file
-    val outputDir = file("$buildDir/distributions")
+    val outputDir: Provider<Directory> = layout.buildDirectory.dir("distributions")
     // Define the output file name
     val outputName = "copy-as-python-aiohttp-$version.jar"
-    // Define the destination file
-    val outputFile = outputDir.resolve(outputName)
     // Define the source file
     val sourceFile = tasks.jar.get().archiveFile.get().asFile
     // Copy the JAR file to the output directory
