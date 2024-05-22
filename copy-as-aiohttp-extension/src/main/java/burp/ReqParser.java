@@ -161,11 +161,21 @@ public class ReqParser {
         // Make the request
         if (session) {
             sb.append(Utility.indent(baseIndent + 1)
-                    + "async with client.request(method, url, headers=headers, cookies=cookies, data=data, allow_redirects=False, ssl=ssl, proxy=proxy) as response:\n");
+                    + "async with client.request(\n");
+            sb.append(Utility.indent(baseIndent + 2) + " ssl=ssl,\n");
         } else {
-            sb.append(Utility.indent(baseIndent + 1)
-                    + "async with aiohttp.request(method, url, headers=headers, cookies=cookies, data=data, allow_redirects=False, ssl=ssl, proxy=proxy) as response:\n");
+            sb.append(Utility.indent(baseIndent + 1) + "async with aiohttp.request(\n");
+            sb.append(
+                    Utility.indent(baseIndent + 2) + "connector=aiohttp.TCPConnector(ssl=ssl),\n");
         }
+        sb.append(Utility.indent(baseIndent + 2) + "method=method,\n");
+        sb.append(Utility.indent(baseIndent + 2) + "url=url,\n");
+        sb.append(Utility.indent(baseIndent + 2) + "headers=headers,\n");
+        sb.append(Utility.indent(baseIndent + 2) + "cookies=cookies,\n");
+        sb.append(Utility.indent(baseIndent + 2) + "data=data,\n");
+        sb.append(Utility.indent(baseIndent + 2) + "proxy=proxy\n");
+        sb.append(Utility.indent(baseIndent + 1) + ") as response:\n");
+
         sb.append(Utility.indent(baseIndent + 2)
                 + "return (response.status, response.headers, response.cookies, response.headers.get('content-length', 0), await response.text())\n");
         return sb.toString();
