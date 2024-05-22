@@ -34,6 +34,12 @@
 
 A Burp extension to generate async Python code from HTTP requests.
 
+This extension generates different flavors of scripts (*e.g.* with/without
+session, with/without main function).
+
+The resulting codes have been tested with `Python 3.11.2` but should work with
+other versions as well.
+
 ## :sparkles: Features ##
 
 :heavy_check_mark: Generate individual async functions from requests;\
