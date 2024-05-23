@@ -81,10 +81,11 @@ For Windows:
 $ ./gradlew.bat build
 ```
 
-Once built, you can find the resulting `jar` file at
+Once built, you can add the resulting `fat Jar` file into your Burp extensions.
+The file will be located at
 
 ```
-./copy-as-aiohttp-extension/build/distributions/copy-as-python-aiohttp-MAJOR.MINOR.PATCH.jar
+./copy-as-python-aiohttp/build/libs/copy-as-python-aiohttp-MAJOR.MINOR.PATCH-fat.jar
 ```
 
 ## :memo: License ##
