@@ -177,9 +177,12 @@ public class ReqParser {
             sb.append(Utility.indent(baseIndent + 1) + "async with client.request(\n");
             sb.append(Utility.indent(baseIndent + 2) + " ssl=ssl,\n");
         } else {
+            sb.append(Utility.indent(baseIndent + 1)
+                    + "async with aiohttp.TCPConnector(ssl=ssl) as conn:\n");
+            baseIndent++;
             sb.append(Utility.indent(baseIndent + 1) + "async with aiohttp.request(\n");
             sb.append(
-                    Utility.indent(baseIndent + 2) + "connector=aiohttp.TCPConnector(ssl=ssl),\n");
+                    Utility.indent(baseIndent + 2) + "connector=conn,\n");
         }
         sb.append(Utility.indent(baseIndent + 2) + "method=method,\n");
         sb.append(Utility.indent(baseIndent + 2) + "url=url,\n");
