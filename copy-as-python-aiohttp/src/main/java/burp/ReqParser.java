@@ -99,6 +99,7 @@ public class ReqParser {
         sb.append("if __name__ == '__main__':\n");
         sb.append(Utility.indent(1) + "loop = asyncio.get_event_loop()\n");
         sb.append(Utility.indent(1) + "loop.run_until_complete(main())\n");
+        sb.append(Utility.indent(1) + "conn.close()\n");
         return sb.toString();
     }
 
