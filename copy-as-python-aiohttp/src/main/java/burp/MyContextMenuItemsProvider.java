@@ -13,9 +13,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Context menu items provider class
+ */
 public class MyContextMenuItemsProvider implements ContextMenuItemsProvider {
     private final MontoyaApi api;
 
+    /**
+     * Constructor
+     *
+     * @param api The Montoya API
+     */
     public MyContextMenuItemsProvider(MontoyaApi api) {
         this.api = api;
     }

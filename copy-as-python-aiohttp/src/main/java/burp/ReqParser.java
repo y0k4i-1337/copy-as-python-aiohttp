@@ -11,9 +11,17 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.WWWFormCodec;
 import org.json.JSONObject;
 
+/**
+ * Request parser class to convert requests to Python script
+ */
 public class ReqParser {
     private final List<HttpRequestResponse> messages;
 
+    /**
+     * Constructor
+     *
+     * @param messages The list of messages
+     */
     public ReqParser(List<HttpRequestResponse> messages) {
         this.messages = messages;
     }
@@ -165,8 +173,7 @@ public class ReqParser {
         }
         // Make the request
         if (session) {
-            sb.append(Utility.indent(baseIndent + 1)
-                    + "async with client.request(\n");
+            sb.append(Utility.indent(baseIndent + 1) + "async with client.request(\n");
             sb.append(Utility.indent(baseIndent + 2) + " ssl=ssl,\n");
         } else {
             sb.append(Utility.indent(baseIndent + 1) + "async with aiohttp.request(\n");
@@ -177,7 +184,11 @@ public class ReqParser {
         sb.append(Utility.indent(baseIndent + 2) + "url=url,\n");
         sb.append(Utility.indent(baseIndent + 2) + "headers=headers,\n");
         sb.append(Utility.indent(baseIndent + 2) + "cookies=cookies,\n");
-        sb.append(Utility.indent(baseIndent + 2) + "data=data,\n");
+        if (request.contentType() == ContentType.JSON) {
+            sb.append(Utility.indent(baseIndent + 2) + "json=payload,\n");
+        } else {
+            sb.append(Utility.indent(baseIndent + 2) + "data=payload,\n");
+        }
         sb.append(Utility.indent(baseIndent + 2) + "proxy=proxy\n");
         sb.append(Utility.indent(baseIndent + 1) + ") as response:\n");
 
@@ -261,14 +272,14 @@ public class ReqParser {
                                 + Utility.escapeQuotes(pair.getValue()) + "',\n");
                     }
                 } catch (Exception e) {
-                    
+
                 }
 
                 sb.append(Utility.indent(baseIndent) + "}\n");
             } else if (request.contentType() == ContentType.JSON) {
                 JSONObject json = new JSONObject(request.bodyToString());
                 sb.append(Utility.convertToJsonString(json, baseIndent, Optional.of("payload = ")));
-            }  else {
+            } else {
                 sb.append(Utility.indent(baseIndent) + "payload = '"
                         + Utility.escapeQuotes(request.bodyToString()) + "'\n");
             }

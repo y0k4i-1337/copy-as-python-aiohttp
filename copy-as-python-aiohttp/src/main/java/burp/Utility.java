@@ -20,7 +20,6 @@ public class Utility {
      * Copy the given text to the clipboard
      *
      * @param text The text to copy
-     * @return void
      */
     public static void copyToClipboard(String text) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text),
@@ -31,7 +30,6 @@ public class Utility {
      * Copy the given text to the clipboard
      *
      * @param text The text to copy
-     * @return void
      */
     public static void copyToClipboard(StringBuilder text) {
         Toolkit.getDefaultToolkit().getSystemClipboard()
@@ -63,6 +61,8 @@ public class Utility {
      * Convert a JSONObject to a string representation
      *
      * @param jsonObject The JSONObject to convert
+     * @param baseIndentLevel The base indentation level
+     * @param prefix The prefix to add to the string
      * @return The string representation of the JSONObject
      */
     public static String convertToJsonString(JSONObject jsonObject, int baseIndentLevel,

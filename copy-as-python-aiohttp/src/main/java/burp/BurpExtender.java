@@ -4,6 +4,10 @@ import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 
 
+/**
+ * BurpExtender class to register
+ * the extension with Burp Suite
+ */
 public class BurpExtender implements BurpExtension {
     @Override
     public void initialize(MontoyaApi api) {

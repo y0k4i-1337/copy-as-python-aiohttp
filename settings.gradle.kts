@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "copy-as-python-aiohttp"
-include("copy-as-aiohttp-extension")
+include("copy-as-python-aiohttp")
