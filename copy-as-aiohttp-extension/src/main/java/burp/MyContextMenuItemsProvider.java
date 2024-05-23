@@ -14,8 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class MyContextMenuItemsProvider implements ContextMenuItemsProvider {
+    private final MontoyaApi api;
 
-    public MyContextMenuItemsProvider(MontoyaApi api) {}
+    public MyContextMenuItemsProvider(MontoyaApi api) {
+        this.api = api;
+    }
 
     @Override
     public List<Component> provideMenuItems(ContextMenuEvent event) {

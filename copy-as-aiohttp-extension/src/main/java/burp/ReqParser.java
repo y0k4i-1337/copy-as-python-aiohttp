@@ -1,9 +1,15 @@
 package burp;
 
 import java.util.List;
+import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import burp.api.montoya.http.message.ContentType;
 import burp.api.montoya.http.message.HttpHeader;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
+import org.json.JSONObject;
 
 public class ReqParser {
     private final List<HttpRequestResponse> messages;
@@ -153,10 +159,9 @@ public class ReqParser {
         sb.append(parseHeaders(request, baseIndent + 1));
         // Chef if there is a body
         if (request.body().length() > 0) {
-            sb.append(Utility.indent(baseIndent + 1) + "data = '"
-                    + Utility.escapeQuotes(request.bodyToString()) + "'\n");
+            sb.append(parseBody(request, baseIndent + 1));
         } else {
-            sb.append(Utility.indent(baseIndent + 1) + "data = None\n");
+            sb.append(Utility.indent(baseIndent + 1) + "payload = None\n");
         }
         // Make the request
         if (session) {
@@ -239,6 +244,36 @@ public class ReqParser {
             sb.append(Utility.indent(baseIndent) + "}\n");
         } else {
             sb.append(Utility.indent(baseIndent) + "headers = None\n");
+        }
+        return sb.toString();
+    }
+
+    private String parseBody(HttpRequest request, int baseIndent) {
+        StringBuilder sb = new StringBuilder();
+        if (request.body().length() > 0) {
+            if (request.contentType() == ContentType.URL_ENCODED) {
+                sb.append(Utility.indent(baseIndent) + "payload = {\n");
+                try {
+                    List<NameValuePair> decodedForm =
+                            WWWFormCodec.parse(request.bodyToString(), StandardCharsets.ISO_8859_1);
+                    for (NameValuePair pair : decodedForm) {
+                        sb.append(Utility.indent(baseIndent + 1) + "'" + pair.getName() + "': '"
+                                + Utility.escapeQuotes(pair.getValue()) + "',\n");
+                    }
+                } catch (Exception e) {
+                    
+                }
+
+                sb.append(Utility.indent(baseIndent) + "}\n");
+            } else if (request.contentType() == ContentType.JSON) {
+                JSONObject json = new JSONObject(request.bodyToString());
+                sb.append(Utility.convertToJsonString(json, baseIndent, Optional.of("payload = ")));
+            }  else {
+                sb.append(Utility.indent(baseIndent) + "payload = '"
+                        + Utility.escapeQuotes(request.bodyToString()) + "'\n");
+            }
+        } else {
+            sb.append(Utility.indent(baseIndent) + "payload = None\n");
         }
         return sb.toString();
     }

@@ -22,6 +22,13 @@ dependencies {
     // Dependency needed to create a new extension
     // https://mvnrepository.com/artifact/net.portswigger.burp.extensions/montoya-api
     implementation("net.portswigger.burp.extensions:montoya-api:2023.12.1")
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents.core5/httpcore5
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.2.4")
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -30,6 +37,7 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
@@ -66,4 +74,15 @@ tasks.named("distJar") {
 
 tasks.named("build") {
     finalizedBy("distJar")
+}
+
+tasks.register<Jar>("uberJar") {
+    archiveClassifier = "uber"
+
+    from(sourceSets.main.get().output)
+
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
