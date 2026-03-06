@@ -14,5 +14,7 @@ public class BurpExtender implements BurpExtension {
         api.extension().setName("Copy as Python aiohttp");
         api.userInterface().registerContextMenuItemsProvider(new MyContextMenuItemsProvider(api));
         api.logging().logToOutput("'Copy as Python aiohttp' extension loaded!");
+        api.logging().logToOutput("Remember to install the required dependencies with:");
+        api.logging().logToOutput("pip install 'aiohttp[speedups]' aiofiles aiocsv");
     }
 }
