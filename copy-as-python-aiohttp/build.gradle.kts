@@ -21,7 +21,7 @@ dependencies {
 
     // Dependency needed to create a new extension
     // https://mvnrepository.com/artifact/net.portswigger.burp.extensions/montoya-api
-    implementation("net.portswigger.burp.extensions:montoya-api:2026.2")
+    compileOnly("net.portswigger.burp.extensions:montoya-api:2026.2")
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.core5/httpcore5
     implementation("org.apache.httpcomponents.core5:httpcore5:5.4.1")
