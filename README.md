@@ -24,6 +24,7 @@
   <a href="#rocket-technologies">Technologies</a> &#xa0; | &#xa0;
   <a href="#hammer-building">Building</a> &#xa0; | &#xa0;
   <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
+  <a href="#book-usage">Usage</a> &#xa0; | &#xa0;
   <a href="#memo-license">License</a> &#xa0; | &#xa0;
   <a href="https://github.com/y0k4i-1337" target="_blank">Author</a>
 </p>
@@ -37,7 +38,7 @@ A Burp extension to generate async Python code from HTTP requests.
 This extension generates different flavors of scripts (*e.g.* with/without
 session, with/without main function).
 
-The resulting codes have been tested with `Python 3.11.2` but they should work with
+The resulting codes have been tested with `Python 3.14.3` but they should work with
 other versions as well.
 
 ## :sparkles: Features ##
@@ -87,6 +88,32 @@ The file will be located at
 ```
 ./copy-as-python-aiohttp/build/libs/copy-as-python-aiohttp-MAJOR.MINOR.PATCH-fat.jar
 ```
+
+## :book: Usage ##
+
+Before using the resulting snippet, make sure to install the required dependencies with:
+
+```bash
+pip install 'aiohttp[speedups]' aiofiles aiocsv
+```
+
+Once the extension is loaded in Burp, you can right-click on any HTTP requests
+and select the "Copy as Python aiohttp" option to generate the corresponding
+Python code.
+
+There are four different options to choose from in the main context menu:
+
+- "Copy requests": generates individual async functions for each selected
+  request.
+- "Copy requests with session object": generates individual async functions for
+  each selected request where a session object is passed as an argument to the
+  function.
+- "Generate script" submenu: has the same options as above but combines all the
+  requests into a single script with a main function.
+- "Generate password spraying template": generates a template script for
+  password spraying attacks.
+
+Remember to customize the generated code as needed, especially the password spraying template, which is meant to be a starting point for your attacks.
 
 ## :memo: License ##
 
