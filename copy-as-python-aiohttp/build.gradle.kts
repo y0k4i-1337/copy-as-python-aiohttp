@@ -17,14 +17,14 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20240303")
+    implementation("org.json:json:20251224")
 
     // Dependency needed to create a new extension
     // https://mvnrepository.com/artifact/net.portswigger.burp.extensions/montoya-api
-    implementation("net.portswigger.burp.extensions:montoya-api:2023.12.1")
+    implementation("net.portswigger.burp.extensions:montoya-api:2026.2")
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.core5/httpcore5
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.2.4")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.4.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
